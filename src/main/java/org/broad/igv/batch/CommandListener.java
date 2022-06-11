@@ -34,6 +34,7 @@ import org.broad.igv.oauth.OAuthProvider;
 import org.broad.igv.oauth.OAuthUtils;
 import org.broad.igv.prefs.Constants;
 import org.broad.igv.prefs.PreferencesManager;
+import org.broad.igv.session.IGVSessionReader;
 import org.broad.igv.ui.IGV;
 import org.broad.igv.ui.util.MessageUtils;
 import org.broad.igv.ui.util.UIUtilities;
@@ -475,14 +476,16 @@ public class CommandListener implements Runnable {
                 boolean cmdExeWillDecode = (fileParams.contains(key) || indexParams.contains(key)) && CommandExecutor.needsDecode(kv[1]);
 
                 String value = cmdExeWillDecode ? kv[1] : StringUtils.decodeURL(kv[1]);
+                
+                value = IGVSessionReader.remapPath(value);
+                
                 params.put(kv[0], value);
             }
         }
         return params;
 
     }
-
-
+   
     /**
      * Compute a socket key according to the WebSocket RFC.  This method is here because this is the only class that uses it.
      *

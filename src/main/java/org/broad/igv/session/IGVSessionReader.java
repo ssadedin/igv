@@ -41,6 +41,8 @@ import org.broad.igv.lists.GeneListManager;
 import org.broad.igv.logging.LogManager;
 import org.broad.igv.logging.Logger;
 import org.broad.igv.maf.MultipleAlignmentTrack;
+import org.broad.igv.prefs.Constants;
+import org.broad.igv.prefs.PreferencesManager;
 import org.broad.igv.renderer.ColorScale;
 import org.broad.igv.renderer.ColorScaleFactory;
 import org.broad.igv.renderer.ContinuousColorScale;
@@ -1181,14 +1183,53 @@ public class IGVSessionReader implements SessionReader {
 
     private String getAbsolutePath(String path, String sessionPath) {
         String absolute = FileUtils.getAbsolutePath(path, sessionPath);
+
+        path = remapPath(path);
+
+        String absolute = FileUtils.getAbsolutePath(path, rootPath);
         if (!(new File(absolute)).exists() && path.startsWith("~")) {
             String tmp = FileUtils.getAbsolutePath(path.replaceFirst("~", System.getProperty("user.home")), sessionPath);
             if ((new File(tmp)).exists()) {
                 absolute = tmp;
             }
         }
+
         return absolute;
     }
+    
+    /**
+     * If a system property is set in the form igv.pathRemapSpec=/foo:/bar, use that property 
+     * to remap incoming paths to new values.
+     * 
+     * @param value raw value
+     * @return  remapped value
+     */
+    public static String remapPath(String value) {
+        String remapSpec = System.getProperty("igv.pathRemapSpec");
+
+        if(remapSpec == null) {
+            String from = PreferencesManager.getPreferences().get(Constants.PATH_REMAP_FROM_PATTERN_1);
+            String to = PreferencesManager.getPreferences().get(Constants.PATH_REMAP_TO_PATTERN_1);
+            if(from.trim().length()>0) {
+                remapSpec = from + ':' + to;
+                log.info("Path remapping spec used from preferences " + remapSpec);                                                                                                                                                                     
+            }
+        }
+        
+        if(remapSpec != null) {
+            log.info("Path remapping spec detected - searching for " + remapSpec + " in url " + value);                                                                                                                                                                     
+            String [] remapPrefixParts = remapSpec.split(":");
+            if(value.matches(remapPrefixParts[0])) {
+                log.info("Remapping path " + value + " due to remap specification set to " + remapSpec);
+                value = value.replaceAll(remapPrefixParts[0],remapPrefixParts[1]);
+            }
+            else {
+                log.info("Path " + value + " does not start with path remapping spec");
+            }
+        }
+        return value;
+    }
+ 
 
     public List<Track> getTracksById(String trackId) {
         List<Track> tracks = allTracks.get(trackId);
