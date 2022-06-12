@@ -1210,22 +1210,33 @@ public class IGVSessionReader implements SessionReader {
         if(remapSpec == null) {
             String from = PreferencesManager.getPreferences().get(Constants.PATH_REMAP_FROM_PATTERN_1);
             String to = PreferencesManager.getPreferences().get(Constants.PATH_REMAP_TO_PATTERN_1);
-            if(from.trim().length()>0) {
-                remapSpec = from + ':' + to;
+            if(from != null && from.trim().length()>0) {
+                if(to == null) {
+                    log.error("Null value provided for remap to preference");
+                    return value;
+                }
+                remapSpec = from + ',' + to;
                 log.info("Path remapping spec used from preferences " + remapSpec);                                                                                                                                                                     
             }
         }
         
         if(remapSpec != null) {
-            log.info("Path remapping spec detected - searching for " + remapSpec + " in url " + value);                                                                                                                                                                     
-            String [] remapPrefixParts = remapSpec.split(":");
-            if(value.matches(remapPrefixParts[0])) {
-                log.info("Remapping path " + value + " due to remap specification set to " + remapSpec);
-                value = value.replaceAll(remapPrefixParts[0],remapPrefixParts[1]);
+            log.info("Path remapping spec detected - searching for " + remapSpec + " in url " + value);
+            String [] remapPrefixParts = remapSpec.split(",");
+            String [] valueParts = value.split(",");
+            List<String> mappedParts = new ArrayList<String>();
+            for(String valuePart : valueParts) {
+                if(valuePart.matches(remapPrefixParts[0])) {
+                    log.info("Remapping path " + value + " due to remap specification set to " + remapSpec);
+                    valuePart = valuePart.replaceAll(remapPrefixParts[0],remapPrefixParts[1]);
+                }
+                else {
+                    log.info("Path " + valuePart + " does not start with path remapping spec: " + remapPrefixParts[0]);
+                }                
+                mappedParts.add(valuePart);
             }
-            else {
-                log.info("Path " + value + " does not start with path remapping spec");
-            }
+            
+            value = String.join(",", mappedParts);
         }
         return value;
     }
