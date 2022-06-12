@@ -222,6 +222,16 @@ public class GlobalKeyDispatcher implements KeyEventDispatcher {
         });
         inputMap.put(regionKey, "region");
         actionMap.put("region", regionAction);
+        
+        // Create a new session
+        final KeyStroke newSessionKey = KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK, false);
+        final Action newSessionAction = new EnableWrappedAction(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+            	igv.newSession();
+            }
+        });
+        inputMap.put(newSessionKey, "newSession");
+        actionMap.put("newSession", newSessionAction);
 
         // Create region-of-interest at center of view (1 bp wide)
         final KeyStroke regionCenterKey = KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK + KeyEvent.SHIFT_MASK, false);
