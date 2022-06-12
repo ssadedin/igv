@@ -138,7 +138,16 @@ public class CommandListener implements Runnable {
             currentListenerPort = port;
             while (!halt) {
                 clientSocket = serverSocket.accept();
-                processClientSession(cmdExe);
+                try {
+                    processClientSession(cmdExe);
+                }
+                catch(IOException e) {
+                    throw e;
+                }
+                catch(Exception e) {
+                    log.error("Unexpected error in client socket loop", e);
+                }
+
                 if (clientSocket != null) {
                     try {
                         clientSocket.close();
