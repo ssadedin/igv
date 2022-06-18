@@ -46,6 +46,8 @@ public class AlignmentInterval extends Locus {
     private SpliceJunctionHelper spliceJunctionHelper;
     private List<DownsampledInterval> downsampledIntervals;
     private PackedAlignments packedAlignments;
+    
+    private boolean isPinned = false;
 
     public AlignmentInterval(String chr, int start, int end,
                              List<Alignment> alignments,
@@ -176,6 +178,15 @@ public class AlignmentInterval extends Locus {
     public void dumpAlignments() {
         if (this.alignments != null) this.alignments.clear();
         this.packedAlignments = null;
+    }
+
+
+    public boolean isPinned() {
+        return isPinned;
+    }
+
+    public void setPinned(boolean isPinned) {
+        this.isPinned = isPinned;
     }
 
 

@@ -111,6 +111,7 @@ public class CommandExecutor {
             String param2 = args.size() > 2 ? args.get(2) : null;
             String param3 = args.size() > 3 ? args.get(3) : null;
             String param4 = args.size() > 4 ? args.get(4) : null;
+            String residual = String.join(" ",args.stream().skip(1).collect(Collectors.toList()));
 
             if (cmd.equalsIgnoreCase("echo")) {
                 result = param1 != null ? param1 : cmd;
@@ -220,6 +221,8 @@ public class CommandExecutor {
                 result = this.overlay(args);
             } else if (cmd.equalsIgnoreCase("separate")) {
                 result = this.separate(param1);
+            } else if (cmd.equalsIgnoreCase("precache")) {
+                result = this.precache(residual);
             } else {
                 result = "UNKOWN COMMAND: " + commandLine;
                 log.warn(result);
@@ -424,6 +427,24 @@ public class CommandExecutor {
         } else {
             return "No track found matching " + trackName;
         }
+    }
+
+    private String precache(String intervalValues) {
+    	log.info("Pre-caching intervals: " + intervalValues);
+    	String [] intervals = intervalValues.split(" ");
+    	for(String interval : intervals) {
+			Range range = Range.fromString(interval);
+			final List<Track> tracks = igv.getAllTracks();
+			for(Track track : tracks) {
+				if(track instanceof AlignmentTrack) {
+					AlignmentTrack alignmentTrack = (AlignmentTrack) track;
+					alignmentTrack.cacheInterval(range);
+				}
+			}
+			
+			log.info("Finished pre-caching interval " + interval);
+     	}
+        return "OK";
     }
 
     private List<Track> tracksMatchingName(String name) {
