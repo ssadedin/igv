@@ -459,7 +459,8 @@ public class CommandListener implements Runnable {
 
                 String value = cmdExeWillDecode ? kv[1] : StringUtils.decodeURL(kv[1]);
                 
-                value = IGVSessionReader.remapPath(value);
+                if(key.equals("file"))
+                    value = IGVSessionReader.remapPath(value);
                 
                 params.put(kv[0], value);
             }
