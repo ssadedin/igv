@@ -1776,5 +1776,8 @@ public class AlignmentTrack extends AbstractTrack implements IGVEventObserver {
         }
     }
 
+	public void cacheInterval(final Range range) {
+		this.dataManager.cacheInterval(range, renderOptions);
+	}
 
 }

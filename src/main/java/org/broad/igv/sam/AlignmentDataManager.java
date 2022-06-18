@@ -299,18 +299,43 @@ public class AlignmentDataManager implements IGVEventObserver {
 
 
     }
+    
+    /**
+     * Add intervals to the cache without them necessarily being displayed
+     */
+    public AlignmentInterval cacheInterval(final Range range, AlignmentTrack.RenderOptions renderOptions) {
+        
+        currentlyLoading = range;
+        
+        try {
+            AlignmentInterval loadedInterval = loadInterval(range.chr, range.start, range.end, renderOptions);
 
+            intervalCache.add(loadedInterval);
+            
+            loadedInterval.setPinned(true);
+            
+            return loadedInterval;
+        }
+        finally {
+            currentlyLoading = null;
+        }
+    }
+    
     /**
      * Remove out-of-view intervals from the cache.  This is O(N) where N = #frames X #intervals.   It is assumed
      * that N is small
      */
     private void trimCache() {
         List<AlignmentInterval> trimmedIntervals = new ArrayList<>();
+        
         for (AlignmentInterval interval : intervalCache) {
-            if (intervalInView(interval)) {
+            if (intervalInView(interval) || interval.isPinned()) {
                 trimmedIntervals.add(interval);
             }
         }
+        
+        log.info("Trimmed interval cache from " + intervalCache.size() + " to " + trimmedIntervals.size());
+        
         intervalCache = trimmedIntervals;
     }
 
