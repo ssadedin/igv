@@ -290,6 +290,8 @@ task createMacDistZip(type: Zip, dependsOn: createDist) {
 
 task createMacWithJavaDistZip(type: Zip, dependsOn: createDist) {
     archiveName = "IGV_Mac_${version}_WithJava.zip"
+    if(!new File(jdkBundleMac).exists())
+        throw new IllegalArgumentException("No Mac JVM Bundle configured or configured path could not be found")
     with copySpec { from jdkBundleMac into "jdk-11" }
     from("${buildDir}/IGV-dist") {
         exclude "*.bat"
