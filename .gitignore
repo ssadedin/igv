@@ -23,3 +23,4 @@ out/
 /src/main/java/org/broad/igv/sam/mods/BMScale.java
 /src/main/java/org/broad/igv/sam/mods/BMScale.form
 /ignore/
+/eclipse-build/
