@@ -20,3 +20,4 @@ out/
 *.csi.gz
 *.sai
 /test/batch/snapshots/
+/eclipse-build/
