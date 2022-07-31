@@ -190,6 +190,7 @@ tasks.withType(Test) {
 }
 
 task createDist(type: Copy, dependsOn: jar) {
+    duplicatesStrategy 'include'
     from("web/IGV_64.png")
     from("scripts") {
         include '*.bat'
